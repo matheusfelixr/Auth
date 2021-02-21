@@ -2,8 +2,10 @@ package com.matheusfelixr.authentication.service;
 
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateResponseDTO;
+import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordResponseDTO;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
+import com.matheusfelixr.authentication.util.Password;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +34,9 @@ public class SecurityService implements UserDetailsService {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private EmailService emailService;
 	
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -68,5 +73,12 @@ public class SecurityService implements UserDetailsService {
         } catch (BadCredentialsException e) {
             throw new ValidationException("Senha invalida");
         }
+    }
+
+    public ResetPasswordResponseDTO resetPassword(String userName) throws Exception {
+        String password = Password.generatePasswordInt(5);
+        UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password);
+        emailService.resetPassword(userAuthentication, password);
+        return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o seu E-mail");
     }
 }

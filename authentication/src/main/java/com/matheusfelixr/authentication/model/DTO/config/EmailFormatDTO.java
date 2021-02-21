@@ -15,4 +15,14 @@ public class EmailFormatDTO {
 
 	private String body;
 
+	public EmailFormatDTO() {
+	}
+
+	public EmailFormatDTO(String sender, List<String> recipients, String subject, String body) {
+		this.sender = sender;
+		this.recipients = recipients;
+		this.subject = subject;
+		this.body = body;
+	}
+
 }

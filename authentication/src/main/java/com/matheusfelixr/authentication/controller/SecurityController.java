@@ -3,6 +3,8 @@ package com.matheusfelixr.authentication.controller;
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
 import com.matheusfelixr.authentication.model.DTO.config.ResponseApi;
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateResponseDTO;
+import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordRequestDTO;
+import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordResponseDTO;
 import com.matheusfelixr.authentication.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,27 @@ public class SecurityController {
 			e.printStackTrace();
 			LOGGER.error("Erro inesperado ao tentar autenticar");
 			List<String> erros = Arrays.asList("Erro inesperado ao tentar autenticar");
+			response.setErrors(erros);
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+	}
+
+	@PostMapping(value  = "/reset-password")
+	public ResponseEntity<ResponseApi<ResetPasswordResponseDTO>> resetPassword(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO) throws Exception {
+		LOGGER.debug("Inicio processo de reset de senha.");
+		ResponseApi<ResetPasswordResponseDTO> response = new ResponseApi<>();
+		try {
+			response.setData(this.securityService.resetPassword(resetPasswordRequestDTO.getUsername()));
+			LOGGER.debug("Reset de senha realizado com sucesso.");
+			return ResponseEntity.ok(response);
+		} catch (ValidationException e) {
+			LOGGER.error(e.getMessage());
+			response.setErrors(Arrays.asList(e.getMessage()));
+			return ResponseEntity.badRequest().body(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("Erro inesperado ao tentar resetar senha");
+			List<String> erros = Arrays.asList("Erro inesperado ao tentar resetar senha");
 			response.setErrors(erros);
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}

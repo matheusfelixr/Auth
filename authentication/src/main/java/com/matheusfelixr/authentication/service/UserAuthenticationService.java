@@ -35,6 +35,13 @@ public class UserAuthenticationService {
         return Optional.ofNullable(userAuthenticationRepository.findByEmail(Email));
     }
 
+    public UserAuthentication modifyPassword(String userName, String password) throws Exception {
+        UserAuthentication userAuthentication = this.validateModifyPassword(userName);
+        userAuthentication.setPassword(this.passwordEncoder.encode(password));
+
+        userAuthenticationRepository.save(userAuthentication);
+        return userAuthentication;
+    }
 
     private void validateNewUser(UserAuthentication userAuthentication) throws Exception {
         Optional<UserAuthentication> userResName = this.findByUserName(userAuthentication.getUserName());
@@ -46,5 +53,13 @@ public class UserAuthenticationService {
         if(userResEmail.isPresent()) {
             throw new ValidationException("E-mail já cadastrado para outro usuário");
         }
+    }
+
+    private UserAuthentication validateModifyPassword(String userName) throws Exception {
+        Optional<UserAuthentication> userResName = this.findByUserName(userName);
+        if(!userResName.isPresent()) {
+            throw new ValidationException("Usuário não encontrado");
+        }
+        return userResName.get();
     }
 }
