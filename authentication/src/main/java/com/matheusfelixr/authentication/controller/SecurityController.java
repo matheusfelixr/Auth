@@ -1,7 +1,7 @@
 package com.matheusfelixr.authentication.controller;
 
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
-import com.matheusfelixr.authentication.model.DTO.ResponseApi;
+import com.matheusfelixr.authentication.model.DTO.config.ResponseApi;
 import com.matheusfelixr.authentication.model.DTO.security.AuthenticateResponseDTO;
 import com.matheusfelixr.authentication.service.SecurityService;
 import org.slf4j.Logger;
