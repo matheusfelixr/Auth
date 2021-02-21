@@ -3,6 +3,7 @@ package com.matheusfelixr.authentication.service;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.repository.UserAuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -15,14 +16,14 @@ public class UserAuthenticationService {
     @Autowired
     private UserAuthenticationRepository userAuthenticationRepository;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserAuthentication create(UserAuthentication userAuthentication) throws Exception {
 
         validateNewUser(userAuthentication);
 
-    //    userAuthentication.setPassword(this.passwordEncoder.encode(userAuthentication.getPassword()));
+        userAuthentication.setPassword(this.passwordEncoder.encode(userAuthentication.getPassword()));
         return userAuthenticationRepository.save(userAuthentication);
     }
 
