@@ -31,10 +31,26 @@ public class EmailService {
 
     public void resetPassword(UserAuthentication userAuthentication, String password) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        EmailFormatDTO emailFormatDTO =   new EmailFormatDTO("Sistem <matheusfelixr@hotmail.com>",
+        EmailFormatDTO emailFormatDTO =   new EmailFormatDTO("noreply <matheusfelixr@hotmail.com>",
                 Arrays.asList(userAuthentication.getUserName()+"<"+userAuthentication.getEmail()+">")
                 , "Reset de senha",
                 "Sua nova senha e: " + password);
+
+        simpleMailMessage.setFrom(emailFormatDTO.getSender());
+        simpleMailMessage.setTo(emailFormatDTO.getRecipients()
+                .toArray(new String[emailFormatDTO.getRecipients().size()]));
+        simpleMailMessage.setSubject(emailFormatDTO.getSubject());
+        simpleMailMessage.setText(emailFormatDTO.getBody());
+
+        javaMailSender.send(simpleMailMessage);
+    }
+
+    public void newUser(UserAuthentication userAuthentication, String password) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        EmailFormatDTO emailFormatDTO =   new EmailFormatDTO("noreply <matheusfelixr@hotmail.com>",
+                Arrays.asList(userAuthentication.getUserName()+"<"+userAuthentication.getEmail()+">")
+                , "Cadastro de novo usuário",
+                "Você acaba de ser cadastrado no sistema seu usuário e: "+ userAuthentication.getUserName() +" é a sua senha é: " + password);
 
         simpleMailMessage.setFrom(emailFormatDTO.getSender());
         simpleMailMessage.setTo(emailFormatDTO.getRecipients()

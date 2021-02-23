@@ -1,8 +1,6 @@
 package com.matheusfelixr.authentication.service;
 
-import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
-import com.matheusfelixr.authentication.model.DTO.security.AuthenticateResponseDTO;
-import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordResponseDTO;
+import com.matheusfelixr.authentication.model.DTO.security.*;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
 import com.matheusfelixr.authentication.util.Password;
@@ -88,5 +86,18 @@ public class SecurityService implements UserDetailsService {
         UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password);
         emailService.resetPassword(userAuthentication, password);
         return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o seu E-mail");
+    }
+
+
+    public CreateUserResponseDTO createUser(CreateUserRequestDTO createUserRequestDTO) throws Exception {
+        String password = Password.generatePasswordInt(5);
+        UserAuthentication ret = new UserAuthentication();
+        ret.setUserName(createUserRequestDTO.getUsername());
+        ret.setPassword(password);
+        ret.setEmail(createUserRequestDTO.getEmail());
+
+        userAuthenticationService.create(ret);
+
+        return new CreateUserResponseDTO ("Foi enviado uma nova senha para o seu E-mail");
     }
 }

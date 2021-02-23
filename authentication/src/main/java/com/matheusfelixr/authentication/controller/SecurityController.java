@@ -1,10 +1,7 @@
 package com.matheusfelixr.authentication.controller;
 
-import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
+import com.matheusfelixr.authentication.model.DTO.security.*;
 import com.matheusfelixr.authentication.model.DTO.config.ResponseApi;
-import com.matheusfelixr.authentication.model.DTO.security.AuthenticateResponseDTO;
-import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordRequestDTO;
-import com.matheusfelixr.authentication.model.DTO.security.ResetPasswordResponseDTO;
 import com.matheusfelixr.authentication.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +66,29 @@ public class SecurityController {
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
 	}
+
+
+	@PostMapping(value  = "/create-user")
+	public ResponseEntity<ResponseApi<CreateUserResponseDTO>> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) throws Exception {
+		LOGGER.debug("Inicio processo de criação de usuario.");
+		ResponseApi<CreateUserResponseDTO> response = new ResponseApi<>();
+		try {
+			response.setData(this.securityService.createUser(createUserRequestDTO));
+			LOGGER.debug("Processo de criação de usuario realizado com sucesso.");
+			return ResponseEntity.ok(response);
+		} catch (ValidationException e) {
+			LOGGER.error(e.getMessage());
+			response.setErrors(Arrays.asList(e.getMessage()));
+			return ResponseEntity.badRequest().body(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("Erro inesperado ao tentar criar novo usuário");
+			List<String> erros = Arrays.asList("Erro inesperado ao tentar criar novo usuário");
+			response.setErrors(erros);
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+	}
+
 
 
 }

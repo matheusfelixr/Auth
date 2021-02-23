@@ -19,12 +19,18 @@ public class UserAuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
     public UserAuthentication create(UserAuthentication userAuthentication) throws Exception {
 
         validateNewUser(userAuthentication);
-
+        String password = userAuthentication.getPassword();
         userAuthentication.setPassword(this.passwordEncoder.encode(userAuthentication.getPassword()));
-        return userAuthenticationRepository.save(userAuthentication);
+
+        UserAuthentication ret = userAuthenticationRepository.save(userAuthentication);
+        emailService.newUser(userAuthentication, password);
+        return ret;
     }
 
     public Optional<UserAuthentication> findByUserName(String userName){
