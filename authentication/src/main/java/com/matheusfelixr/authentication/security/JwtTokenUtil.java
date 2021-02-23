@@ -29,34 +29,24 @@ public class JwtTokenUtil implements Serializable {
 
 	//retorna o username do token jwt 
 	public String getUsernameFromToken(String token) {
-		LOGGER.info("getUsernameFromToken entrada -> "+ token );
 		String ret = getClaimFromToken(token, Claims::getSubject);
-
-		LOGGER.info("getUsernameFromToken saida -> "+ ret );
-
 		return ret;
 	}
 
 	//retorna expiration date do token jwt 
 	public Date getExpirationDateFromToken(String token) {
-		LOGGER.info("getExpirationDateFromToken entrada -> "+ token );
 		Date ret = getClaimFromToken(token, Claims::getExpiration);
-		LOGGER.info("getExpirationDateFromToken saida -> "+ ret );
 		return ret;
 	}
 
 	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = getAllClaimsFromToken(token);
 		return claimsResolver.apply(claims);
-
 	}
 
 	//para retornar qualquer informação do token nos iremos precisar da secret key
 	private Claims getAllClaimsFromToken(String token) {
-		LOGGER.info("getAllClaimsFromToken entrada -> "+ token );
 		Claims ret = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-		LOGGER.info("getAllClaimsFromToken saida -> "+ ret );
-
 		return ret;
 	}
 
@@ -68,21 +58,13 @@ public class JwtTokenUtil implements Serializable {
 
 	//gera token para user
 	public String generateToken(UserDetails userDetails) {
-		LOGGER.info("generateToken entrada -> "+ userDetails );
-
 		Map<String, Object> claims = new HashMap<>();
 		String ret = doGenerateToken(claims, userDetails.getUsername());
-		LOGGER.info("generateToken saida -> "+ ret );
-
 		return ret;
 	}
 
 	//Cria o token e define tempo de expiração pra ele
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
-		LOGGER.info("resultado para calcular validade do token-> "+ (System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 99999999));
-
-		LOGGER.info("Validade do token -> "+ new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 99999999));
-
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 99999999))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
