@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.ValidationException;
 import java.util.Arrays;
 import java.util.List;
@@ -28,11 +29,11 @@ public class SecurityController {
 	private SecurityService securityService;
 
 	@PostMapping(value  = "/authenticate")
-	public ResponseEntity<ResponseApi<AuthenticateResponseDTO>> authenticate(@RequestBody AuthenticateRequestDTO authenticateRequestDTO) throws Exception {
+	public ResponseEntity<ResponseApi<AuthenticateResponseDTO>> authenticate(@RequestBody AuthenticateRequestDTO authenticateRequestDTO, HttpServletRequest httpServletRequest) throws Exception {
 		LOGGER.debug("Inicio processo de autenticacao.");
 		ResponseApi<AuthenticateResponseDTO> response = new ResponseApi<>();
 		try {
-			response.setData(this.securityService.authenticate(authenticateRequestDTO));
+			response.setData(this.securityService.authenticate(authenticateRequestDTO,httpServletRequest ));
 			LOGGER.debug("Autenticacao realizada com sucesso.");
 			return ResponseEntity.ok(response);
 		} catch (ValidationException e) {
@@ -49,7 +50,7 @@ public class SecurityController {
 	}
 
 	@PostMapping(value  = "/reset-password")
-	public ResponseEntity<ResponseApi<ResetPasswordResponseDTO>> resetPassword(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO) throws Exception {
+	public ResponseEntity<ResponseApi<ResetPasswordResponseDTO>> resetPassword(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO, HttpServletRequest httpServletRequest) throws Exception {
 		LOGGER.debug("Inicio processo de reset de senha.");
 		ResponseApi<ResetPasswordResponseDTO> response = new ResponseApi<>();
 		try {

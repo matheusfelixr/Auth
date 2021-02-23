@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.ValidationException;
 import java.util.Optional;
 
@@ -37,6 +38,10 @@ public class SecurityService implements UserDetailsService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private HistoryAuthenticationService historyAuthenticationService;
+
 	
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -56,7 +61,7 @@ public class SecurityService implements UserDetailsService {
     }
 
 
-    public AuthenticateResponseDTO authenticate(AuthenticateRequestDTO authenticateRequestDTO) throws Exception {
+    public AuthenticateResponseDTO authenticate(AuthenticateRequestDTO authenticateRequestDTO, HttpServletRequest httpServletRequest ) throws Exception {
         try {
             //Autentica o usuario
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticateRequestDTO.getUsername(), authenticateRequestDTO.getPassword()));
@@ -66,11 +71,14 @@ public class SecurityService implements UserDetailsService {
             String token = jwtTokenUtil.generateToken(userDetails);
             //Busca os dados do usuario
             UserAuthentication userAuthentication = this.userAuthenticationService.findByUserName(authenticateRequestDTO.getUsername()).get();
-
+            //Gera historico
+            historyAuthenticationService.generateHistorySucess(userAuthentication, httpServletRequest );
             return new AuthenticateResponseDTO(userAuthentication.getUserName(), token);
         } catch (DisabledException e) {
+            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Usuário desabilitado");
             throw new ValidationException("Usuário desabilitado");
         } catch (BadCredentialsException e) {
+            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Senha invalida");
             throw new ValidationException("Senha invalida");
         }
     }

@@ -1,13 +1,14 @@
 package com.matheusfelixr.authentication.config;
 
+import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
+import com.matheusfelixr.authentication.service.SecurityService;
 import com.matheusfelixr.authentication.service.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -33,6 +34,9 @@ public class SwaggerConfig {
 
     @Autowired
     UserAuthenticationService userAuthenticationService;
+
+    @Autowired
+    SecurityService securityService;
 
     @Bean
     public Docket api() {
@@ -64,9 +68,8 @@ public class SwaggerConfig {
     public String security() {
         String token;
         try {
-            createFristUser();
-            UserDetails userDetails = this.apiUserService.loadUserByUsername("admin");
-            token = jwtTokenUtil.generateToken(userDetails);
+            AuthenticateRequestDTO authenticateRequestDTO = getOrCreateUser();
+            token = securityService.authenticate(authenticateRequestDTO, null ).getToken();
         } catch (Exception e) {
             e.printStackTrace();
             token = "";
@@ -75,20 +78,27 @@ public class SwaggerConfig {
         return token;
     }
 
-    private void createFristUser() {
+    private AuthenticateRequestDTO getOrCreateUser() {
         try {
             Optional<UserAuthentication> user = userAuthenticationService.findByUserName("admin");
+            UserAuthentication userAuthentication = new UserAuthentication();
+            String password= "123456";
             if (!user.isPresent()) {
                 UserAuthentication ret = new UserAuthentication();
 
                 ret.setUserName("admin");
-                ret.setPassword("123456");
+                ret.setPassword(password);
                 ret.setEmail("matheusfelixr@gmail.com");
 
-                userAuthenticationService.create(ret);
+                userAuthentication = userAuthenticationService.create(ret);
+            }else{
+                userAuthentication = user.get();
             }
+
+            return new AuthenticateRequestDTO(userAuthentication.getUserName(), password);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 }

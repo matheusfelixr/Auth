@@ -7,5 +7,12 @@ public class AuthenticateRequestDTO {
 	
 	private String username;
 	private String password;
-	
+
+	public AuthenticateRequestDTO() {
+	}
+
+	public AuthenticateRequestDTO(String username, String password) {
+		this.username = username;
+		this.password = password;
+	}
 }
