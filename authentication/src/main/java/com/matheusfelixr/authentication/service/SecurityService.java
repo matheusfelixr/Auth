@@ -3,6 +3,7 @@ package com.matheusfelixr.authentication.service;
 import com.matheusfelixr.authentication.model.DTO.security.*;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
+import com.matheusfelixr.authentication.util.EmailHelper;
 import com.matheusfelixr.authentication.util.Password;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -85,7 +86,7 @@ public class SecurityService implements UserDetailsService {
         String password = Password.generatePasswordInt(5);
         UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password);
         emailService.resetPassword(userAuthentication, password);
-        return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o seu E-mail");
+        return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o E-mail: "+EmailHelper.maskEmail(userAuthentication.getEmail()));
     }
 
 
@@ -98,6 +99,6 @@ public class SecurityService implements UserDetailsService {
 
         userAuthenticationService.create(ret);
 
-        return new CreateUserResponseDTO ("Foi enviado uma nova senha para o seu E-mail");
+        return new CreateUserResponseDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " +EmailHelper.maskEmail(ret.getEmail()));
     }
 }
