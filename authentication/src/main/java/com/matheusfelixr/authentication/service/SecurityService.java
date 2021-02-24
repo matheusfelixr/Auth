@@ -10,7 +10,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -100,5 +103,17 @@ public class SecurityService implements UserDetailsService {
         userAuthenticationService.create(ret);
 
         return new CreateUserResponseDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " +EmailHelper.maskEmail(ret.getEmail()));
+    }
+
+    public UserAuthentication getCurrentUser() throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        Optional<UserAuthentication> ret = userAuthenticationService.findByUserName(principal.getUsername());
+        if(!ret.isPresent()){
+            throw new ValidationException("Erro ao encontrar usuario. Contate o desenvolvedor.");
+        }
+
+        return ret.get();
     }
 }
