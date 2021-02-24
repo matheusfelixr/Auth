@@ -44,7 +44,9 @@ public class SecurityService implements UserDetailsService {
     @Autowired
     private HistoryAuthenticationService historyAuthenticationService;
 
-	
+    @Autowired
+    private HistoryResetPasswordService historyResetPasswordService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     	    	
@@ -85,10 +87,11 @@ public class SecurityService implements UserDetailsService {
         }
     }
 
-    public ResetPasswordResponseDTO resetPassword(String userName) throws Exception {
+    public ResetPasswordResponseDTO resetPassword(String userName, HttpServletRequest httpServletRequest) throws Exception {
         String password = Password.generatePasswordInt(5);
         UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password);
         emailService.resetPassword(userAuthentication, password);
+        historyResetPasswordService.generateHistory(userAuthentication, httpServletRequest);
         return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o E-mail: "+EmailHelper.maskEmail(userAuthentication.getEmail()));
     }
 
