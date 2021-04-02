@@ -1,41 +1,34 @@
 package com.matheusfelixr.authentication;
 
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 @SpringBootTest
 class AuthenticationApplicationTests {
 
 	@Test
-	void contextLoads() throws FileNotFoundException {
+	void contextLoads()  {
+		try {
+			String ntpServer = "a.st1.ntp.br";//servidor de horario brasileiro
 
-		Scanner in = new Scanner(new FileReader("D:\\teste.txt"));
-
-		while (in.hasNextLine()) {
-			String line = in.nextLine();
-			System.out.println(line);
-
-
-			int index = 0;
-			int nextPipe = 0;
-			String lineFor = line;
-			for(index = 0 ; index < 1;){
-
-				nextPipe= lineFor.indexOf("|");
-				if(nextPipe == -1){
-					System.out.println(lineFor.substring(0, lineFor.length()) );
-					index = 1;
-				}else{
-					System.out.println(lineFor.substring(0, nextPipe) );
-					lineFor = lineFor.substring(nextPipe + 1, lineFor.length());
-				}
-
-
-			}
+			NTPUDPClient timeClient = new NTPUDPClient();
+			InetAddress inetAddress = InetAddress.getByName(ntpServer);
+			TimeInfo timeInfo = timeClient.getTime(inetAddress);
+			long returnTime = timeInfo.getReturnTime();
+			Date time = new Date(returnTime);
+			System.out.println("Hora para " + ntpServer + ": " + time);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
