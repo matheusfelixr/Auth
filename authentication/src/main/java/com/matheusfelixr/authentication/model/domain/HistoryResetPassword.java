@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "HISTORY_RESET_PASSWORD" )
-@SequenceGenerator(name = "SEQ_HISTORY_RESET_PASSWORD", sequenceName = "SEQ_HISTORY_RESET_PASSWORD")
+@SequenceGenerator(name = "SEQ_HISTORY_RESET_PASSWORD", sequenceName = "SEQ_HISTORY_RESET_PASSWORD", allocationSize = 1)
 public class HistoryResetPassword {
 
     @Id

@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "HISTORY_AUTHENTICATION" )
-@SequenceGenerator(name = "SEQ_HISTORY_AUTHENTICATION", sequenceName = "SEQ_HISTORY_AUTHENTICATION")
+@SequenceGenerator(name = "SEQ_HISTORY_AUTHENTICATION", sequenceName = "SEQ_HISTORY_AUTHENTICATION", allocationSize = 1)
 public class HistoryAuthentication {
 
     @Id
@@ -29,9 +29,5 @@ public class HistoryAuthentication {
 
     @Column(name = "OBSERVATION")
     private String observation;
-
-    @Column(name = "USER_NAME")
-    private String UserName;
-
 
 }

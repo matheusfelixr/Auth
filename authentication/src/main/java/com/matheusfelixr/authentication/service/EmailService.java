@@ -36,7 +36,7 @@ public class EmailService {
         EmailFormatDTO emailFormatDTO =   new EmailFormatDTO("noreply <matheusfelixr@hotmail.com>",
                 Arrays.asList(userAuthentication.getUserName()+"<"+userAuthentication.getEmail()+">")
                 , "Cadastro de novo usuário",
-                "Você acaba de ser cadastrado no sistema seu usuário e: "+ userAuthentication.getUserName() +" é a sua senha é: " + password);
+                "Você acaba de ser cadastrado no sistema, seu usuário é: "+ userAuthentication.getUserName() +" e a sua senha é: " + password);
 
         simpleMailMessage.setFrom(emailFormatDTO.getSender());
         simpleMailMessage.setTo(emailFormatDTO.getRecipients()

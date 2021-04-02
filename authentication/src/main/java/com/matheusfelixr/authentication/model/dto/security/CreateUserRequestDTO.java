@@ -9,11 +9,8 @@ public class CreateUserRequestDTO {
 
 	private String email;
 
-	public CreateUserRequestDTO() {
-	}
+	private String password;
 
-	public CreateUserRequestDTO(String username, String email) {
-		this.username = username;
-		this.email = email;
-	}
+	private Boolean isAdmin;
+
 }

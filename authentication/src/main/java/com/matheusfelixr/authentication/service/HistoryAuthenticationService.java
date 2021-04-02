@@ -24,7 +24,6 @@ public class HistoryAuthenticationService {
         historyAuthentication.setUserAuthentication(userAuthentication);
         historyAuthentication.setDate(new Date());
         historyAuthentication.setObservation("Login realizado com sucesso");
-        historyAuthentication.setUserName(userAuthentication.getUserName());
         if(httpServletRequest != null){
             historyAuthentication.setIp(httpServletRequest.getRemoteAddr());
         }
@@ -35,7 +34,6 @@ public class HistoryAuthenticationService {
         HistoryAuthentication historyAuthentication = new HistoryAuthentication();
         historyAuthentication.setDate(new Date());
         historyAuthentication.setObservation(observation);
-        historyAuthentication.setUserName(userName);
         if(httpServletRequest != null){
             historyAuthentication.setIp(httpServletRequest.getRemoteAddr());
         }

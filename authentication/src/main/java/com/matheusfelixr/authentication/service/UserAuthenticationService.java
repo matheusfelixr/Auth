@@ -23,9 +23,11 @@ public class UserAuthenticationService {
 
     public UserAuthentication create(UserAuthentication userAuthentication) throws Exception {
 
+        //Realiza validações
         validateNewUser(userAuthentication);
+
         String password = userAuthentication.getPassword();
-        userAuthentication.setPassword(this.passwordEncoder.encode(userAuthentication.getPassword()));
+        userAuthentication.setPassword(this.passwordEncoder.encode(password));
 
         UserAuthentication ret = userAuthenticationRepository.save(userAuthentication);
         emailService.newUser(userAuthentication, password);

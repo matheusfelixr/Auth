@@ -113,15 +113,36 @@ public class SecurityService implements UserDetailsService {
 
 
     public MessageDTO createUser(CreateUserRequestDTO createUserRequestDTO) throws Exception {
-        String password = Password.generatePasswordInt(5);
+        // Pego senha
+        String password = this.getPassword(createUserRequestDTO);
+
+        //Cria objeto a ser salvo
+        UserAuthentication ret = this.getUserAuthentication(createUserRequestDTO, password);
+
+        //chama metodo para criar usario
+        this.userAuthenticationService.create(ret);
+
+        return new MessageDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " + EmailHelper.maskEmail(ret.getEmail()));
+    }
+
+    private UserAuthentication getUserAuthentication(CreateUserRequestDTO createUserRequestDTO, String password) {
         UserAuthentication ret = new UserAuthentication();
         ret.setUserName(createUserRequestDTO.getUsername().trim());
         ret.setPassword(password);
         ret.setEmail(createUserRequestDTO.getEmail());
         ret.setChangePassword(true);
-        userAuthenticationService.create(ret);
+        ret.setIsAdmin(createUserRequestDTO.getIsAdmin());
+        return ret;
+    }
 
-        return new MessageDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " + EmailHelper.maskEmail(ret.getEmail()));
+    private String getPassword(CreateUserRequestDTO createUserRequestDTO) {
+        String password ="";
+        if(createUserRequestDTO.getPassword() == null || createUserRequestDTO.getPassword().equals("") ){
+            password = Password.generatePasswordInt(5);
+        }else{
+            password = createUserRequestDTO.getPassword();
+        }
+        return password;
     }
 
     public AuthenticateResponseDTO newPassword(NewPasswordRequestDTO newPasswordRequestDTO, HttpServletRequest httpServletRequest) throws Exception {
