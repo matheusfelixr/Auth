@@ -82,13 +82,13 @@ public class SecurityService implements UserDetailsService {
             //Busca os dados do usuario
             UserAuthentication userAuthentication = this.userAuthenticationService.findByUserName(authenticateRequestDTO.getUsername()).get();
             //Gera historico
-            historyAuthenticationService.generateHistorySucess(userAuthentication, httpServletRequest );
+            historyAuthenticationService.generateHistorySuccess(userAuthentication, httpServletRequest );
             return new AuthenticateResponseDTO(userAuthentication.getUserName(), token,userAuthentication.getChangePassword(), userAuthentication.getIsAdmin());
         } catch (DisabledException e) {
-            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Usuário desabilitado");
+            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO, httpServletRequest, "Usuário desabilitado: " + authenticateRequestDTO.getUsername());
             throw new ValidationException("Usuário desabilitado");
         } catch (BadCredentialsException e) {
-            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Senha invalida");
+            historyAuthenticationService.generateHistoryFail(authenticateRequestDTO, httpServletRequest, "Senha invalida para o usuário: " + authenticateRequestDTO.getUsername());
             throw new ValidationException("Verifique se digitou corretamente usuário e senha.");
         }
     }

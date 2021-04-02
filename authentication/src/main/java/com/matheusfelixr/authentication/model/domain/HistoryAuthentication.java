@@ -24,6 +24,10 @@ public class HistoryAuthentication {
     @Column(name = "DATE", nullable = false)
     private Date date;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "NTP_DATE", nullable = true)
+    private Date ntpDate;
+
     @Column(name = "IP")
     private String ip;
 

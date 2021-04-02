@@ -17,14 +17,18 @@ public class HistoryResetPassword {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_AUTHENTICATION", referencedColumnName = "ID")
+    @JoinColumn(name = "USER_AUTHENTICATION", referencedColumnName = "ID", nullable = false)
     private UserAuthentication userAuthentication;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE", nullable = false)
     private Date date;
 
-    @Column(name = "IP")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "NTP_DATE", nullable = true)
+    private Date ntpDate;
+
+    @Column(name = "IP", nullable = true)
     private String ip;
 
 }
