@@ -1,4 +1,4 @@
-package com.matheusfelixr.authentication.model.DTO.security;
+package com.matheusfelixr.authentication.model.dto.security;
 
 import lombok.Data;
 

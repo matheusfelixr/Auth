@@ -1,7 +1,11 @@
 package com.matheusfelixr.authentication.service;
 
-import com.matheusfelixr.authentication.model.DTO.security.*;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
+import com.matheusfelixr.authentication.model.dto.MessageDTO;
+import com.matheusfelixr.authentication.model.dto.security.AuthenticateRequestDTO;
+import com.matheusfelixr.authentication.model.dto.security.AuthenticateResponseDTO;
+import com.matheusfelixr.authentication.model.dto.security.CreateUserRequestDTO;
+import com.matheusfelixr.authentication.model.dto.security.NewPasswordRequestDTO;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
 import com.matheusfelixr.authentication.util.EmailHelper;
 import com.matheusfelixr.authentication.util.Password;
@@ -46,7 +50,7 @@ public class SecurityService implements UserDetailsService {
 
     @Autowired
     private HistoryResetPasswordService historyResetPasswordService;
-
+	
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     	    	
@@ -67,6 +71,8 @@ public class SecurityService implements UserDetailsService {
 
     public AuthenticateResponseDTO authenticate(AuthenticateRequestDTO authenticateRequestDTO, HttpServletRequest httpServletRequest ) throws Exception {
         try {
+            //valida autenticacao
+            this.validateAuthenticate(authenticateRequestDTO);
             //Autentica o usuario
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticateRequestDTO.getUsername(), authenticateRequestDTO.getPassword()));
             //Busca o userDetails para geracao do token
@@ -77,35 +83,51 @@ public class SecurityService implements UserDetailsService {
             UserAuthentication userAuthentication = this.userAuthenticationService.findByUserName(authenticateRequestDTO.getUsername()).get();
             //Gera historico
             historyAuthenticationService.generateHistorySucess(userAuthentication, httpServletRequest );
-            return new AuthenticateResponseDTO(userAuthentication.getUserName(), token);
+            return new AuthenticateResponseDTO(userAuthentication.getUserName(), token,userAuthentication.getChangePassword(), userAuthentication.getIsAdmin());
         } catch (DisabledException e) {
             historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Usuário desabilitado");
             throw new ValidationException("Usuário desabilitado");
         } catch (BadCredentialsException e) {
             historyAuthenticationService.generateHistoryFail(authenticateRequestDTO.getUsername(), httpServletRequest, "Senha invalida");
-            throw new ValidationException("Senha invalida");
+            throw new ValidationException("Verifique se digitou corretamente usuário e senha.");
         }
     }
 
-    public ResetPasswordResponseDTO resetPassword(String userName, HttpServletRequest httpServletRequest) throws Exception {
+    private void validateAuthenticate(AuthenticateRequestDTO authenticateRequestDTO) throws ValidationException {
+        if(authenticateRequestDTO.getUsername() == null || authenticateRequestDTO.getUsername().length() == 0 ){
+            throw new ValidationException("Usuário não pode ser vazio");
+        }
+        if(authenticateRequestDTO.getPassword() == null || authenticateRequestDTO.getUsername().length() == 0 ){
+            throw new ValidationException("Senha não pode ser vazio");
+        }
+        authenticateRequestDTO.setUsername(authenticateRequestDTO.getUsername().trim());
+    }
+
+    public MessageDTO resetPassword(String userName, HttpServletRequest httpServletRequest) throws Exception {
         String password = Password.generatePasswordInt(5);
-        UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password);
+        UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(userName, password , true);
         emailService.resetPassword(userAuthentication, password);
         historyResetPasswordService.generateHistory(userAuthentication, httpServletRequest);
-        return new ResetPasswordResponseDTO ("Foi enviado uma nova senha para o E-mail: "+EmailHelper.maskEmail(userAuthentication.getEmail()));
+        return new MessageDTO ("Foi enviado uma nova senha para o E-mail: "+EmailHelper.maskEmail(userAuthentication.getEmail()));
     }
 
 
-    public CreateUserResponseDTO createUser(CreateUserRequestDTO createUserRequestDTO) throws Exception {
+    public MessageDTO createUser(CreateUserRequestDTO createUserRequestDTO) throws Exception {
         String password = Password.generatePasswordInt(5);
         UserAuthentication ret = new UserAuthentication();
-        ret.setUserName(createUserRequestDTO.getUsername());
+        ret.setUserName(createUserRequestDTO.getUsername().trim());
         ret.setPassword(password);
         ret.setEmail(createUserRequestDTO.getEmail());
-
+        ret.setChangePassword(true);
         userAuthenticationService.create(ret);
 
-        return new CreateUserResponseDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " +EmailHelper.maskEmail(ret.getEmail()));
+        return new MessageDTO ("Usuário cadastrado com sucesso! Foi enviada a senha para o E-mail: " + EmailHelper.maskEmail(ret.getEmail()));
+    }
+
+    public AuthenticateResponseDTO newPassword(NewPasswordRequestDTO newPasswordRequestDTO, HttpServletRequest httpServletRequest) throws Exception {
+        UserAuthentication userAuthentication = userAuthenticationService.modifyPassword(newPasswordRequestDTO.getUserName(), newPasswordRequestDTO.getPassword() , false);
+        emailService.newPassword(userAuthentication);
+        return this.authenticate(new AuthenticateRequestDTO(newPasswordRequestDTO.getUserName(), newPasswordRequestDTO.getPassword()), httpServletRequest);
     }
 
     public UserAuthentication getCurrentUser() throws Exception {

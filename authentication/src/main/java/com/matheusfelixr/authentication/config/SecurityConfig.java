@@ -1,5 +1,7 @@
 package com.matheusfelixr.authentication.config;
 
+
+import com.matheusfelixr.authentication.filter.CorsFilter;
 import com.matheusfelixr.authentication.filter.JwtRequestFilter;
 import com.matheusfelixr.authentication.security.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
-import com.matheusfelixr.authentication.filter.CorsFilter;
 
 
 @Configuration
@@ -42,11 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		
 		httpSecurity.addFilterBefore(corsFilter(), SessionManagementFilter.class).csrf().disable()
 		// Não verifique essas requisições
-		.authorizeRequests().antMatchers("/security/authenticate**",
-										 "/security/reset-password**",
+		.authorizeRequests().antMatchers(
+										 "/**",
 										 "/v2/api-docs",
 										 "/configuration/ui",
 										 "/swagger-resources/**",

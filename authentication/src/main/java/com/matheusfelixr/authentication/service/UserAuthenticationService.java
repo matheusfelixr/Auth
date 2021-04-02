@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import javax.xml.bind.ValidationException;
 import java.util.Optional;
 
@@ -34,17 +33,17 @@ public class UserAuthenticationService {
     }
 
     public Optional<UserAuthentication> findByUserName(String userName){
-        return Optional.ofNullable(userAuthenticationRepository.findByUserName(userName));
+        return Optional.ofNullable(userAuthenticationRepository.findByUserNameAndCancellationCancellationDateIsNull(userName));
     }
 
     public Optional<UserAuthentication> findByEmail(String Email){
-        return Optional.ofNullable(userAuthenticationRepository.findByEmail(Email));
+        return Optional.ofNullable(userAuthenticationRepository.findByEmailAndCancellationCancellationDateIsNull(Email));
     }
 
-    public UserAuthentication modifyPassword(String userName, String password) throws Exception {
+    public UserAuthentication modifyPassword(String userName, String password, Boolean changePassword) throws Exception {
         UserAuthentication userAuthentication = this.validateModifyPassword(userName);
         userAuthentication.setPassword(this.passwordEncoder.encode(password));
-
+        userAuthentication.setChangePassword(changePassword);
         userAuthenticationRepository.save(userAuthentication);
         return userAuthentication;
     }

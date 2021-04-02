@@ -1,5 +1,5 @@
 
-package com.matheusfelixr.authentication.model.DTO.config;
+package com.matheusfelixr.authentication.model.dto.config;
 
 import java.util.ArrayList;
 import java.util.List;

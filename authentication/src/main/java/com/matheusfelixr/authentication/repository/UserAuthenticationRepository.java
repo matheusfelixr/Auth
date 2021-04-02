@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserAuthenticationRepository extends JpaRepository<UserAuthentication, Long>  {
 
-    UserAuthentication findByUserName(String userName);
+    UserAuthentication findByUserNameAndCancellationCancellationDateIsNull(String userName);
 
-    UserAuthentication findByEmail(String email);
+    UserAuthentication findByEmailAndCancellationCancellationDateIsNull(String email);
 }

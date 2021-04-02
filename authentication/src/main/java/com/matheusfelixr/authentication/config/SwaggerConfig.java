@@ -1,6 +1,6 @@
 package com.matheusfelixr.authentication.config;
 
-import com.matheusfelixr.authentication.model.DTO.security.AuthenticateRequestDTO;
+import com.matheusfelixr.authentication.model.dto.security.AuthenticateRequestDTO;
 import com.matheusfelixr.authentication.model.domain.UserAuthentication;
 import com.matheusfelixr.authentication.security.JwtTokenUtil;
 import com.matheusfelixr.authentication.service.SecurityService;
@@ -80,16 +80,30 @@ public class SwaggerConfig {
 
     private AuthenticateRequestDTO getOrCreateUser() {
         try {
-            Optional<UserAuthentication> user = userAuthenticationService.findByUserName("admin");
+            Optional<UserAuthentication> user = userAuthenticationService.findByUserName("swagger");
+            Optional<UserAuthentication> userSystem = userAuthenticationService.findByUserName("System");
+
             UserAuthentication userAuthentication = new UserAuthentication();
             String password= "123456";
+
+            if(!userSystem.isPresent()){
+                UserAuthentication ret = new UserAuthentication();
+
+                ret.setUserName("System");
+                ret.setPassword(password);
+                ret.setEmail("System@AdminSystem.com");
+                ret.setChangePassword(false);
+                ret.setIsAdmin(true);
+                userAuthenticationService.create(ret);
+            }
             if (!user.isPresent()) {
                 UserAuthentication ret = new UserAuthentication();
 
-                ret.setUserName("admin");
+                ret.setUserName("swagger");
                 ret.setPassword(password);
                 ret.setEmail("matheusfelixr@gmail.com");
-
+                ret.setChangePassword(false);
+                ret.setIsAdmin(true);
                 userAuthentication = userAuthenticationService.create(ret);
             }else{
                 userAuthentication = user.get();
